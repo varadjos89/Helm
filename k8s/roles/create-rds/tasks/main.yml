@@ -1,0 +1,66 @@
+---
+
+- name: Get kube vpc 
+  ec2_vpc_net_info:
+    filters:
+      "tag:Name": "{{ namespace }}"
+  register: ec2_vpcs
+
+- name: Get default vpc 
+  ec2_vpc_net_info:
+    filters:
+      "tag:Name": default
+  register: ec2_default_vpcs
+
+- name: Get route table info 
+  ec2_vpc_route_table_info:
+    filters:
+      "tag:Name": "{{ namespace }}"
+  register: route_tables
+
+- name: Create security group
+  ec2_group_info:
+    filters:
+      "tag:Name": default
+  register: ec2_sgs
+
+- name: Create RDS
+  rds:
+    command: create 
+    instance_name: db1
+    db_name: db1
+    db_engine: MySQL
+    size: 20
+    instance_type: db.t2.micro
+    username: kubernetes
+    password: kubernetes
+    profile: "{{ profile }}"
+    publicly_accessible: no
+    region: "{{ aws_region }}"
+    vpc_security_groups: "{{ ec2_sgs.security_groups[0].group_id }}"
+    wait: yes
+    wait_timeout: 1200
+
+- name: create VPC peering
+  ec2_vpc_peer:
+    region: "{{ aws_region }}"
+    vpc_id: "{{ ec2_vpcs.vpcs[0].vpc_id }}"
+    peer_vpc_id: "{{ ec2_default_vpcs.vpcs[0].vpc_id }}"
+    state: present
+  register: vpc_peer
+
+- name: Accept local VPC peering request
+  ec2_vpc_peer:
+    region: "{{ aws_region }}"
+    peering_id: "{{ vpc_peer.peering_id }}"
+    state: accept
+
+- name: Update route table
+  ec2_vpc_route_table:
+    vpc_id: "{{ ec2_vpcs.vpcs[0].vpc_id }}"
+    region: "{{ aws_region }}"
+    lookup: id
+    route_table_id: "{{ route_tables.route_tables[0].id }}"
+    routes:
+      - dest: "{{ ec2_default_vpcs.vpcs[0].cidr_block }}"
+        vpc_peering_connection_id: "{{ vpc_peer.peering_id }}"

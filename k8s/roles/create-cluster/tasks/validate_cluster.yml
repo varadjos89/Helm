@@ -1,0 +1,7 @@
+---
+- name: Validating the cluster
+  command: kops validate cluster {{namespace}}
+  register: result
+  until: result.stdout.find('Your cluster ' + '{{namespace}}' + ' is ready') != -1
+  retries: 20
+  delay: 60

@@ -1,0 +1,11 @@
+---
+- hosts: localhost
+  connection: local
+  environment:
+    - AWS_REGION: "{{ aws_region }}"
+    - NAME: "{{ namespace }}"
+    - AWS_PROFILE: "{{profile}}"
+
+  tasks:
+    - import_role:
+        name: roles/create-rds

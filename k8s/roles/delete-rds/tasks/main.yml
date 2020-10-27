@@ -1,0 +1,6 @@
+---
+
+- name: delete rds
+  rds:
+    command: delete
+    instance_name: db1

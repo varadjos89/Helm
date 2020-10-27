@@ -1,0 +1,5 @@
+---
+# tasks file for create-metrics-server
+
+- name: Install Metrics Server
+  command: chdir=~/Desktop/CSYE-7374/helm-charts/helm-charts helm install metrics ./metrics-server 

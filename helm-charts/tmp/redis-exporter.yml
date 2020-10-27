@@ -1,0 +1,4 @@
+redisAddress: "redis://test-redis.default.svc:6379"
+
+auth:
+  redisPassword: "password"

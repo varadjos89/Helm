@@ -1,0 +1,5 @@
+  - name: Get availability zones info
+    aws_az_info:
+      filters:
+        region-name: "{{aws_region}}"
+    register: az_facts

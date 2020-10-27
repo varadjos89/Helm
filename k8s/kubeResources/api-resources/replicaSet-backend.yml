@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: api
+  namespace: api
+  labels:
+    app: api
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+      annotations: 
+        iam.amazonaws.com/role: pod2s3
+    spec:
+      containers:
+      - name: api
+        image: junjie3617/webapp-backend:latest
+        env:
+          - name: db_url
+            valueFrom: 
+              configMapKeyRef:
+                name: configmap-api
+                key: db_url
+          - name: bucket_url
+            valueFrom:
+              configMapKeyRef:
+                name: configmap-api
+                key: bucket_url
+        ports:
+        - name: live-port
+          containerPort: 8080
+        livenessProbe:
+          httpGet:
+            path: /test
+            port: 8080
+          initialDelaySeconds: 60
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /test
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+      imagePullSecrets:
+      - name: registrykey
+

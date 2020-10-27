@@ -1,0 +1,55 @@
+---
+###### Create Kubernetes cluster using kops
+- name: get clusters
+  command: kops get clusters
+  ignore_errors: yes
+  register: clusters
+
+- name: Get availability zones info
+  include_tasks: get-az-info.yml
+
+- name: Debug
+  debug:
+    msg: "{{profile}}"
+
+- name: get AZ
+  set_fact:
+    zones: "{{az_facts.availability_zones | map(attribute='zone_name') | list}}"
+
+- name: Get cluster environment
+  set_fact:
+    type: "{{type}}"
+
+- name: Set dev facts
+  set_fact:
+    compute_node_zones: "{{zones | random}}"
+    master_node_zones: "{{zones | random}}"
+    compute_node_size: "{{compute_node_size | default('t3.small')}}"
+    master_node_size: "{{master_node_size | default('t3.small')}}"
+    master_count: "{{master_count | default(1)}}"
+    compute_node_count: "{{compute_node_count | default(4)}}"
+  when: type == "dev"
+
+- name: Set Prod facts
+  set_fact:
+    compute_node_zones: "{{az_facts.availability_zones[0].zone_name }},{{az_facts.availability_zones[1].zone_name}},{{az_facts.availability_zones[2].zone_name}}"
+    master_node_zones: "{{az_facts.availability_zones[0].zone_name }},{{az_facts.availability_zones[1].zone_name}},{{az_facts.availability_zones[2].zone_name}}"
+    compute_node_size: "{{compute_node_size | default('t3.small')}}"
+    master_node_size: "{{master_node_size | default('m4.large')}}"
+    master_count: "{{master_count | default(3)}}"
+    compute_node_count: "{{compute_node_count | default(3)}}"
+  when: type == "prod"
+
+- name: Set up kubernetes_version
+  set_fact:
+    kubernetes_version: 1.15.0
+  when: kubernetes_version is not defined
+
+- name: Create cluster
+  shell: "kops create cluster {{namespace}} --master-count {{master_count}} --node-count {{compute_node_count}} --zones {{compute_node_zones}} --node-size {{compute_node_size}} --master-size {{master_node_size}} --master-zones {{master_node_zones}} --networking kopeio-vxlan --topology private --bastion --ssh-public-key={{ ssh_key }}"
+  when: clusters.stdout.find( '{{namespace}}' ) == -1
+
+- name: Deploy the cluster
+  command: kops update cluster {{namespace}} --yes
+
+- include_tasks: validate_cluster.yml

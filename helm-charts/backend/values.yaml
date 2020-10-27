@@ -1,0 +1,8 @@
+# Default values for mychart.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+imageBackend: junjie3617/csye7220backend:latest
+backendUrl: http://a6af41eaf0f7640469bf6a5f75a6ff63-190384374.us-east-1.elb.amazonaws.com:8080
+

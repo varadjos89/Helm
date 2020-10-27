@@ -1,0 +1,22 @@
+---
+- hosts: localhost
+  connection: local
+  environment:
+    - AWS_REGION: "{{ aws_region }}"
+    - NAME: "{{ namespace }}"
+    - KOPS_STATE_STORE: s3://{{namespace}}
+    - AWS_PROFILE: "{{profile}}"
+
+  tasks:
+    - name: get clusters
+      command: kops get clusters
+      ignore_errors: yes
+      register: clusters
+
+    - import_role:
+        name: 
+          roles/create-cluster
+          #roles/create-metrics-server
+
+    # - name: update a cluster
+    #   command: kops update cluster {{namespace}}

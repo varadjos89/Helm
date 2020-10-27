@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: configmap-api
+  namespace: api
+data:
+  db_url: db1.cg5qut7oyct5.us-east-1.rds.amazonaws.com
+  bucket_url: webapp-csye7374

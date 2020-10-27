@@ -1,0 +1,15 @@
+---
+
+# - name: Get vpc peering info
+#   ec2_vpc_peering_info:
+#     region: "{{ aws_region }}"
+#   register: vpc_peering_ids
+
+# - name: delete vpc peering
+#   ec2_vpc_peer:
+#     region: "{{ aws_region }}"
+#     peering_id: "{{ vpc_peering_ids.result[0].vpc_peering_connection_id }}"
+#     state: absent
+
+- name: Delete kubernetes cluster
+  shell: kops delete cluster --name {{namespace}} --yes

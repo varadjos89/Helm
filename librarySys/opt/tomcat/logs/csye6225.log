@@ -1,0 +1,4 @@
+2020-05-09 14:24:49,122 INFO o.s.b.StartupInfoLogger [main] Starting CcwebappApplication on pc with PID 15744 (/home/pc/Desktop/CSYE7220/librarySys/target/classes started by pc in /home/pc/Desktop/CSYE7220/librarySys)
+2020-05-09 14:24:49,235 DEBUG o.s.b.StartupInfoLogger [main] Running with Spring Boot v2.1.5.RELEASE, Spring v5.1.7.RELEASE
+2020-05-09 14:24:49,236 INFO o.s.b.SpringApplication [main] No active profile set, falling back to default profiles: default
+2020-05-09 14:24:53,250 INFO o.s.b.StartupInfoLogger [main] Started CcwebappApplication in 5.167 seconds (JVM running for 7.593)
